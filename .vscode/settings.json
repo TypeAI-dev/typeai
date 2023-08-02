@@ -1,0 +1,12 @@
+{
+  "eslint.workingDirectories": ["./src"],
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typecript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
+}

@@ -1,0 +1,5 @@
+{
+"@deepkit/core": "../deepkit-framework/packages/core",
+"@deepkit/type": "../deepkit-framework/packages/type",
+"@deepkit/type-compiler": "../deepkit-framework/packages/type-compiler"
+}

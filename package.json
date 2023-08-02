@@ -1,0 +1,86 @@
+{
+  "name": "@typeai/core",
+  "version": "0.5.0",
+  "description": "An AI Engineering Framework for TypeScript",
+  "author": "Jeff LaPorte (https://github.com/jefflaporte)",
+  "repository": "https://github.com/TypeAI-dev/typeai-core",
+  "private": false,
+  "license": "SEE LICENSE IN LICENSE.txt",
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "rm -rf dist && rollup -c",
+    "clean": "rm -rf dist node_modules",
+    "link": "npm-local-development .",
+    "lint": "eslint src",
+    "prepare": "./node_modules/.bin/deepkit-type-install",
+    "prepublishOnly": "pnpm run build",
+    "test": "jest"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "ai",
+    "llm",
+    "openai",
+    "deepkit",
+    "typescript"
+  ],
+  "files": [
+    "dist/*.js",
+    "dist/*.map",
+    "dist/*.d.ts",
+    "README.md",
+    "LICENSE.txt"
+  ],
+  "bugs": {
+    "url": "https://github.com/TypeAI-dev/core/issues/new?template=bug_report.md"
+  },
+  "devDependencies": {
+    "@deepkit/type-compiler": "npm:@jefflaporte/deepkit-type-compiler@1.0.1-alpha.97-jl",
+    "@rollup/plugin-commonjs": "^25.0.3",
+    "@rollup/plugin-node-resolve": "^15.1.0",
+    "@types/debug": "^4.1.8",
+    "@types/jest": "^29.5.2",
+    "@types/node": "^20.3.2",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "esbuild": "^0.18.11",
+    "eslint": "^8.44.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "jest": "^29.5.0",
+    "npm-local-development": "^0.4.0",
+    "rollup": "^3.26.2",
+    "rollup-plugin-dts": "^5.3.0",
+    "rollup-plugin-esbuild": "^5.0.0",
+    "rollup-plugin-esbuild-transform": "^1.5.0",
+    "ts-jest": "^29.1.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.8.4"
+  },
+  "peerDependencies": {
+    "openai": "~3.3",
+    "@deepkit/core": ">=1.0.1-alpha.97",
+    "@deepkit/type": ">=1.0.1-alpha.97-jl"
+  },
+  "dependencies": {
+    "@deepkit/core": "1.0.1-alpha.97",
+    "@deepkit/type": "npm:@jefflaporte/deepkit-type@1.0.1-alpha.97-jl",
+    "@types/lodash": "^4.14.195",
+    "camelcase": "^6.3.0",
+    "debug": "^4.3.4",
+    "gpt-tokenizer": "^2.1.1",
+    "lodash": "^4.17.21",
+    "openai": "~3.3.0"
+  }
+}
