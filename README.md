@@ -4,8 +4,8 @@
   <a href="https://www.npmjs.com/package/@typeai/core">
     <img src="https://img.shields.io/npm/v/@typeai/core">
   </a>
-  <a href="https://github.com/@typeai/core/actions/workflows/ci.yml">
-    <img src="https://github.com/@typeai/core/actions/workflows/ci.yml/badge.svg">
+  <a href="https://github.com/TypeAI-dev/typeai-core/actions/workflows/ci.yml">
+    <img src="https://github.com/TypeAI-dev/typeai-core/actions/workflows/ci.yml/badge.svg">
   </a>
 </p>
 
@@ -31,12 +31,12 @@ Just specify your types and function signatures as you naturally would, and Type
 
 1. [Installation](#installation)
 2. [Usage](#usage)
-	* **Using TypeAI to generate functionality**
-		* AI Models
-		* AI Functions
-		* AI Classifiers
-	* **Using TypeAI to expose functionality to an LLM**
-		* AI "Tool Functions"
+   - **Using TypeAI to generate functionality**
+     - AI Models
+     - AI Functions
+     - AI Classifiers
+   - **Using TypeAI to expose functionality to an LLM**
+     - AI "Tool Functions"
 3. [How does it work?](#how)
 4. [Future Direction & TODOs](#future)
 5. [Acknowledgements](#acknowledgements)
@@ -82,12 +82,11 @@ TypeAI makes connecting your functions and types to AI APIs like OpenAI's chat c
 TypeAI currently provides two main areas of functionality:
 
 - Generation of "magic" AI-backed functions
-	* AI Models
-	* AI Functions
-	* AI Classifiers
+  - AI Models
+  - AI Functions
+  - AI Classifiers
 - Generation and handing of LLM tool function glue
-	* AI "Tool Functions"
-
+  - AI "Tool Functions"
 
 ### AI Functions
 
@@ -167,7 +166,7 @@ const appRouteRes = await AppRoute('I need to talk to somebody about billing')
 
 An AI tool function is a function provided to an LLM for it's own use in generating answers.
 
-Say you have a function and want to provide it's functionality to OpenAI's LLM for use with their ***Function Calling*** feature.
+Say you have a function and want to provide it's functionality to OpenAI's LLM for use with their **_Function Calling_** feature.
 
 _See:_
 
@@ -303,14 +302,14 @@ Note: The OpenAI completion API does not like void function responses.
 
 ## <a name="future"></a>Future Direction & TODOs
 
-* TODO
+- TODO
 
 ## <a name="acknowledgements"></a>Acknowledgements
 
 - the Prefect / Marvin Team
   - The concept of source-code-less AI Functions, Models, and that use function specification and description info to auto-generate their behavior is originally due to the amazing team at [PrefectHQ](https://www.prefect.io/opensource/) that created [prefecthq/marvin](https://github.com/prefecthq/marvin) for use in Python.
 - Wang Chenyu
-	- TypeAI's JSON Schema generation is currently a hacked up version of code plucked from Chenyu's [hanayashiki/deepkit-openapi](https://github.com/hanayashiki/deepkit-openapi)
+  - TypeAI's JSON Schema generation is currently a hacked up version of code plucked from Chenyu's [hanayashiki/deepkit-openapi](https://github.com/hanayashiki/deepkit-openapi)
 
 ## <a name="license"></a>License
 
