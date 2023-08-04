@@ -43,12 +43,14 @@ export type JSONSchemaTypeString =
   | 'boolean'
   | 'null'
 export type JSONSchema = {
-  type: JSONSchemaTypeString
+  type?: JSONSchemaTypeString
   description?: string
   properties?: Record<string, JSONSchema>
   items?: JSONSchema
   enum?: JSONSchemaEnum[]
   required?: string[]
+  $ref?: string
+  $defs?: Record<string, JSONSchema>
 }
 export type JSONSchemaOpenAIFunction = {
   name: string

@@ -36,7 +36,7 @@ describe('Descriptions via annotation types', () => {
     }
 
     const { schema: jsonSchema } = generateLLMFunction(inferredOrganismSpec)
-    const organismProps = jsonSchema.parameters?.properties?.organism?.properties
+    const organismProps = jsonSchema.parameters?.$defs?.Organism?.properties
     expect(organismProps?.species?.description).toEqual('desc1')
     expect(organismProps?.genus?.description).toEqual('desc2')
     expect(organismProps?.family?.description).toEqual('desc3')

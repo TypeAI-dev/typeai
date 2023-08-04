@@ -23,7 +23,8 @@
     "lint": "eslint src",
     "prepare": "./node_modules/.bin/deepkit-type-install",
     "prepublishOnly": "pnpm run build",
-    "test": "jest --setupFiles 'dotenv/config'"
+    "test": "jest --setupFiles 'dotenv/config'",
+    "test-op": "op run --env-file=.env jest -- --color"
   },
   "publishConfig": {
     "access": "public"

@@ -66,6 +66,7 @@ export class OpenAIFunction {
   errors: DeepKitTypeError[] = []
   // eslint-disable-next-line @typescript-eslint/ban-types
   fn: Function
+  $defs: Map<string, JSONSchema> = new Map()
 
   constructor(
     // eslint-disable-next-line @typescript-eslint/ban-types
@@ -76,26 +77,43 @@ export class OpenAIFunction {
     this.schemaRegistry = schemaRegisty
   }
 
-  schemaToJSONSchema(schema: Schema): JSONSchema {
-    const jsonSchema: JSONSchema = {
+  registerDef(name: string, schema?: JSONSchema) {
+    if (this.$defs.has(name) || !schema) return
+    this.$defs.set(name, schema)
+  }
+
+  schemaToJSONSchema(schema: Schema): [JSONSchema, JSONSchema?] {
+    let refJSONSchema: JSONSchema | undefined
+    if (schema.__registryKey) {
+      refJSONSchema = { $ref: `#/$defs/${schema.__registryKey}` }
+    }
+    const defJSONSchema: JSONSchema = {
       type: (schema.type as JSONSchemaTypeString) || 'null',
     }
 
     if (schema.type === 'array') {
       if (schema.items) {
-        jsonSchema.items = this.schemaToJSONSchema(schema.items)
+        const [imm, def] = this.schemaToJSONSchema(schema.items)
+        defJSONSchema.items = imm
+        this.registerDef(schema.items.__registryKey as string, def)
       }
     } else if (schema.properties) {
-      jsonSchema.properties = {}
+      defJSONSchema.properties = {}
       for (const [key, property] of Object.entries(schema.properties)) {
-        jsonSchema.properties[key] = this.schemaToJSONSchema(property)
+        const [imm, def] = this.schemaToJSONSchema(property)
+        defJSONSchema.properties[key] = imm
+        this.registerDef(property.__registryKey as string, def)
       }
     }
-    if (schema.description) jsonSchema.description = schema.description
-    if (schema.required) jsonSchema.required = schema.required
-    if (schema.enum) jsonSchema.enum = schema.enum as JSONSchemaEnum[]
+    if (schema.description) defJSONSchema.description = schema.description
+    if (schema.required) defJSONSchema.required = schema.required
+    if (schema.enum) defJSONSchema.enum = schema.enum as JSONSchemaEnum[]
 
-    return jsonSchema
+    if (refJSONSchema) {
+      return [refJSONSchema, defJSONSchema]
+    } else {
+      return [defJSONSchema, undefined]
+    }
   }
 
   getFunctionSchema(): JSONSchemaOpenAIFunction {
@@ -112,23 +130,22 @@ export class OpenAIFunction {
       functionSchema.parameters.properties = functionSchema.parameters.properties ?? {}
       functionSchema.parameters.required = schema.schema.required ?? []
       for (const [key, subSchema] of Object.entries(schema.schema.properties || {})) {
+        const [imm, def] = this.schemaToJSONSchema(subSchema || {})
+        this.registerDef(subSchema.__registryKey as string, def)
+        const subSchemaJSON = imm
         functionSchema.parameters.properties[key] = {
-          ...this.schemaToJSONSchema(subSchema || {}),
+          ...subSchemaJSON,
         }
       }
     }
+    functionSchema.parameters = functionSchema.parameters || {}
+    functionSchema.parameters.$defs = this.$defs.size ? Object.fromEntries(this.$defs) : undefined
     return functionSchema
   }
 
   serialize(): JSONSchemaOpenAIFunction {
     return cloneDeepWith(this.getFunctionSchema(), (c: any) => {
-      if (typeof c === 'function') {
-        if (c.__type === 'schema' && c.__registryKey && !c.__isComponent) {
-          return {
-            $ref: `#/components/schemas/${c.__registryKey}`,
-          }
-        }
-
+      if (typeof c === 'object') {
         for (const key of Object.keys(c)) {
           // Remove internal keys.
           if (key.startsWith('__')) delete c[key]

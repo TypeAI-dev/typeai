@@ -13,7 +13,6 @@ import {
   TypeObjectLiteral,
   TypeParameter,
   typeOf,
-  resolveClassType,
 } from '@deepkit/type'
 import { getParentClass } from '@deepkit/core'
 import { SchemaRegistry } from './SchemaRegistry'
@@ -148,7 +147,7 @@ export class TypeSchemaResolver {
       this.result.required = required
     }
 
-    // const registryKey = this.schemaRegisty.getSchemaKey(this.t);
+    // const registryKey = this.schemaRegisty.getSchemaKey(this.t)
     const registryKey = String(typeFunction.name)
     debug(`*** resolveFunction: registryKey: ${registryKey}`)
 
@@ -161,12 +160,13 @@ export class TypeSchemaResolver {
     if (this.t.kind !== ReflectionKind.class && this.t.kind !== ReflectionKind.objectLiteral) {
       return
     }
-    const refl = resolveClassType(this.t)
-    debug(
-      `resolveClassOrObjectLiteral: name: ${refl.name} description: ${util.inspect(
-        refl.description,
-      )}`,
-    )
+
+    const registryKey = this.schemaRegisty.getSchemaKey(this.t)
+    if (this.schemaRegisty.store.has(registryKey)) {
+      return
+    } else if (registryKey) {
+      this.schemaRegisty.registerSchema(registryKey, this.t, this.result)
+    }
 
     this.result.type = 'object'
     this.result.description = this.t.description || undefined
@@ -214,8 +214,6 @@ export class TypeSchemaResolver {
       this.result.required = required
     }
 
-    const registryKey = this.schemaRegisty.getSchemaKey(this.t)
-
     if (registryKey) {
       this.schemaRegisty.registerSchema(registryKey, this.t, this.result)
     }
@@ -224,6 +222,13 @@ export class TypeSchemaResolver {
   resolveEnum() {
     if (this.t.kind !== ReflectionKind.enum) {
       return
+    }
+
+    const registryKey = this.schemaRegisty.getSchemaKey(this.t)
+    if (registryKey && this.schemaRegisty.store.has(registryKey)) {
+      return
+    } else {
+      this.schemaRegisty.registerSchema(registryKey, this.t, this.result)
     }
 
     const types = new Set<string>()
@@ -243,7 +248,6 @@ export class TypeSchemaResolver {
     this.result.description = this.t.description || undefined
     this.result.enum = this.t.values as any
 
-    const registryKey = this.schemaRegisty.getSchemaKey(this.t)
     if (registryKey) {
       this.schemaRegisty.registerSchema(registryKey, this.t, this.result)
     }
@@ -333,5 +337,13 @@ export const unwrapTypeSchema = (t: Type, r: SchemaRegistry = new SchemaRegistry
 }
 
 export const resolveTypeSchema = (t: Type, r: SchemaRegistry = new SchemaRegistry()) => {
-  return new TypeSchemaResolver(t, r).resolve()
+  let tsr
+  try {
+    tsr = new TypeSchemaResolver(t, r).resolve()
+  } catch (e) {
+    console.error(`Error: ${util.inspect(e, { depth: 3 })}`)
+    console.error(`SchemaRegistry.store: ${util.inspect(r.store, { depth: 3 })}`)
+    throw e
+  }
+  return tsr
 }

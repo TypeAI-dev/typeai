@@ -62,12 +62,20 @@ describe('Build JSON schema description of a TypeScript function', () => {
             type: 'string',
           },
           unit: {
+            $ref: '#/$defs/TemperatureUnit',
+          },
+          options: {
+            $ref: '#/$defs/WeatherOptions',
+          },
+        },
+        required: ['location', 'options'],
+        $defs: {
+          TemperatureUnit: {
             type: 'string',
             enum: ['celsius', 'fahrenheit'],
           },
-          options: {
+          WeatherOptions: {
             type: 'object',
-            description: 'Options related to weather info',
             properties: {
               flags: {
                 type: 'object',
@@ -84,9 +92,9 @@ describe('Build JSON schema description of a TypeScript function', () => {
                 type: 'boolean',
               },
             },
+            description: 'Options related to weather info',
           },
         },
-        required: ['location', 'options'],
       },
     })
   })
