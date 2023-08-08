@@ -42,6 +42,11 @@ Just specify your types and function signatures as you naturally would, and Type
 5. [Acknowledgements](#acknowledgements)
 6. [License](#license)
 
+### Support
+
+<span style="vertical-align: super">Follow me on Twitter:&nbsp;&nbsp;</span><a href="https://twitter.com/jefflaporte?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="true">Follow @jefflaporte</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
 ## <a name="installation"></a>Installation
 
 ```sh
