@@ -1,8 +1,7 @@
 MIT License
 
 Copyright (c) 2023 Jeff LaPorte
-
-JSON Schema generation code: Copyright 2022 Hanayashiki
+Copyright (c) 2022 Hanayashiki - JSON Schema generation code
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
