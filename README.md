@@ -4,8 +4,11 @@
   <a href="https://www.npmjs.com/package/@typeai/core">
     <img src="https://img.shields.io/npm/v/@typeai/core">
   </a>
-  <a href="https://github.com/TypeAI-dev/typeai-core/actions/workflows/ci.yml">
-    <img src="https://github.com/TypeAI-dev/typeai-core/actions/workflows/ci.yml/badge.svg">
+  <a href="https://github.com/TypeAI-dev/typeai/actions/workflows/ci.yml">
+    <img src="https://github.com/TypeAI-dev/typeai/actions/workflows/ci.yml/badge.svg">
+  </a>
+  <a href="https://github.com/TypeAI-dev/typeai/blob/main/LICENSE.txt">
+	<img alt="GitHub" src="https://img.shields.io/github/license/TypeAI-dev/typeai">
   </a>
 </p>
 
@@ -44,7 +47,7 @@ Just specify your types and function signatures as you naturally would, and Type
 
 ### Support
 
-<span style="vertical-align: super">Follow me on Twitter:&nbsp;&nbsp;</span>![Twitter Follow](https://img.shields.io/twitter/follow/jefflaporte)
+Follow me on Twitter: ![Twitter Follow](https://img.shields.io/twitter/follow/jefflaporte)
 
 
 ## <a name="installation"></a>Installation
