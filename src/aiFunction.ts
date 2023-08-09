@@ -122,12 +122,12 @@ export function toAIFunction<T, R>(
   }
 
   // Build JSON schema description of wrapped function
-  const wrappedFnTool = ToolFunction.fromFunction(f)
+  const wrappedFnTool = ToolFunction.from(f)
   const wrappedFnJSONSchema = wrappedFnTool.schema
   const inputJSONSchema = wrappedFnJSONSchema.parameters?.properties
 
   // Build JSON schema description of submitLLMGeneratedData
-  const submitLLMGeneratedDataTool = ToolFunction.fromFunction(submitLLMGeneratedData)
+  const submitLLMGeneratedDataTool = ToolFunction.from(submitLLMGeneratedData)
   const submitGeneratedDataSchema = submitLLMGeneratedDataTool.schema
 
   // Magic function
@@ -159,15 +159,21 @@ export function toAIFunction<T, R>(
   return fn
 }
 
+export type ToAIFunctionViaRuntimeTypesOptions = ToAIFunctionOptions & {
+  name?: string
+}
+
 export function toAIFunctionViaRuntimeTypes<T, R>(
   iType: Type,
   rType: Type,
-  toAIFunctionOptions?: ToAIFunctionOptions,
+  options?: ToAIFunctionViaRuntimeTypesOptions,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
 ): <MagicAIFunction>(input: T, aiFunctionOptions?: AIFunctionOptions) => Promise<Exclude<R, void>> {
   type RMinusVoid = Exclude<R, void>
 
-  const signature = 'toLocation(input: string) => Location'
+  const toAIFunctionOptions = options
+  const name = options?.name || `to${rType.typeName}`
+  const signature = `${name}(input: string) => ${rType.typeName}`
   const inputJSONSchema = {
     input: {
       type: 'string',
@@ -176,7 +182,7 @@ export function toAIFunctionViaRuntimeTypes<T, R>(
   debug(`rType: ${util.inspect(rType, { depth: 8 })}`)
 
   // Build JSON schema description of submitLLMGeneratedData
-  const registry = toAIFunctionOptions?.registry || SchemaRegistry.getInstance()
+  const registry = options?.registry || SchemaRegistry.getInstance()
   const resolver = new TypeSchemaResolver(rType, registry)
   resolver.resolve()
   const rKey = registry.getTypeKey(rType)
@@ -198,14 +204,15 @@ export function toAIFunctionViaRuntimeTypes<T, R>(
 
   // Magic function
   type MagicAIFunction = {
-    (input: T, aiFunctionOptions?: AIFunctionOptions): Promise<RMinusVoid>
+    (input: T, options?: AIFunctionOptions): Promise<RMinusVoid>
     description: string
   }
   const fn = <MagicAIFunction>(async (
     input: T,
-    aiFunctionOptions?: AIFunctionOptions,
+    options?: AIFunctionOptions,
   ): Promise<RMinusVoid> => {
-    const options: AIFunctionOptions = {
+    const aiFunctionOptions = options
+    const _options: AIFunctionOptions = {
       model: aiFunctionOptions?.model || toAIFunctionOptions?.model,
       description: aiFunctionOptions?.description || '',
     }
@@ -216,7 +223,7 @@ export function toAIFunctionViaRuntimeTypes<T, R>(
       submitGeneratedDataSchema,
       inputJSONSchema,
       input,
-      options,
+      _options,
     )
     return Promise.resolve(res as RMinusVoid)
   })

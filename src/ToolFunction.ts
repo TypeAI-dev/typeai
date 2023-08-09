@@ -80,7 +80,7 @@ export class ToolFunction {
     this.schemaRegistry = schemaRegisty || this.schemaRegistry
   }
 
-  static fromFunction<R>(fn: (...args: any[]) => R, schemaRegistry?: SchemaRegistry): ToolFunction {
+  static from<R>(fn: (...args: any[]) => R, schemaRegistry?: SchemaRegistry): ToolFunction {
     const reflectFn = ReflectionFunction.from(fn)
     const registry = schemaRegistry || SchemaRegistry.getInstance()
     const resolver = new TypeSchemaResolver(reflectFn.type, registry)

@@ -5,13 +5,13 @@ const debug = Debug('test')
 
 describe('Build a magic AI model from a function stub', () => {
   test('it should work', async () => {
-    type Organsim = {
+    type Organisim = {
       species: string & Description<'The principal natural taxonomic unit'>
       genus: string & Description<'A principal taxonomic category above species and below family'>
       family: string & Description<'A principal taxonomic category above genus and below order'>
       commonName: string & Description<'The principal natural taxonomic unit'>
     }
-    const organism = toAIModel<Organsim>()
+    const organism = toAIModel<Organisim>()
 
     const organism1 = await organism('the plant that produces espresso beans')
     debug(`organism: ${JSON.stringify(organism1, null, 2)}`)

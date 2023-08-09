@@ -185,7 +185,7 @@ _See:_
 TypeAI provides two functions that make exposing your function to GPT-3.5/4 and handling the resulting function call requests from GPT-3/4 transparent:
 
 ```typescript
-ToolFunction.fromFunction<R>(fn: (...args: any[]) => R): ToolFunction
+ToolFunction.from<R>(fn: (...args: any[]) => R): ToolFunction
 function handleToolUse(
   openAIClient: OpenAIApi,
   messages: ChatCompletionRequestMessage[],
@@ -212,7 +212,7 @@ const configuration = new Configuration({ apiKey: process.env.OPENAI_API_KEY })
 const openai = new OpenAIApi(configuration)
 
 // Generate JSON Schema for function and dependent types
-const getCurrentWeatherTool = ToolFunction.fromFunction(getCurrentWeather)
+const getCurrentWeatherTool = ToolFunction.from(getCurrentWeather)
 const getCurrentWeatherJSONSchema = getCurrentWeatherTool.schema
 
 // Run a chat completion sequence
@@ -280,7 +280,7 @@ const getCurrentWeather = function getCurrentWeather(
 }
 
 // Register your function and type info
-const getCurrentWeatherTool = ToolFunction.fromFunction(getCurrentWeather)
+const getCurrentWeatherTool = ToolFunction.from(getCurrentWeather)
 const jsonSchemaGetCurrentWeather = getCurrentWeatherTool.schema
 
 // Run a completion series

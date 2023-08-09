@@ -51,7 +51,7 @@ describe('Perform a round trip test with the OpenAI API', () => {
 
   test('it should work', async () => {
     // Build JSON schema description of the test function
-    const getCurrentWeatherTool = ToolFunction.fromFunction(getCurrentWeather)
+    const getCurrentWeatherTool = ToolFunction.from(getCurrentWeather)
     const jsonSchemaGetCurrentWeather = getCurrentWeatherTool.schema
     const functionMap = {
       getCurrentWeather: getCurrentWeather,
@@ -106,7 +106,7 @@ describe('Perform a round trip test with the OpenAI API', () => {
 
   test('it should work using handleToolUse', async () => {
     // Build JSON schema description of the test function
-    const getCurrentWeatherTool = ToolFunction.fromFunction(getCurrentWeather)
+    const getCurrentWeatherTool = ToolFunction.from(getCurrentWeather)
     const { registry, schema: jsonSchemaGetCurrentWeather } = getCurrentWeatherTool
 
     // Run a completion series

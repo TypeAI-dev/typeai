@@ -37,7 +37,7 @@ describe('Perform a round trip test with the OpenAI API', () => {
     }
 
     // Build JSON schema description of the test function
-    const submitLLMGeneratedDataTool = ToolFunction.fromFunction(submitLLMGeneratedData)
+    const submitLLMGeneratedDataTool = ToolFunction.from(submitLLMGeneratedData)
     const { registry, schema: jsonSchemaSubmitLLMGeneratedData } = submitLLMGeneratedDataTool
 
     // Run a completion series

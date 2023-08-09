@@ -35,7 +35,7 @@ describe('Descriptions via annotation types', () => {
       return 'OK'
     }
 
-    const inferredOrganismTool = ToolFunction.fromFunction(inferredOrganismSpec)
+    const inferredOrganismTool = ToolFunction.from(inferredOrganismSpec)
     const jsonSchema = inferredOrganismTool.schema
     const organismProps = jsonSchema.parameters?.$defs?.Organism?.properties
     expect(organismProps?.species?.description).toEqual('desc1')
