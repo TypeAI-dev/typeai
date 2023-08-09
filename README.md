@@ -1,6 +1,7 @@
 # TypeAI: An AI Engineering Framework for TypeScript
 
 <p align="center">
+  <img alt="GitHub top language" src="https://img.shields.io/github/languages/top/TypeAI-dev/typeai">
   <a href="https://www.npmjs.com/package/@typeai/core">
     <img src="https://img.shields.io/npm/v/@typeai/core">
   </a>
@@ -49,20 +50,20 @@ Just specify your types and function signatures as you naturally would, and Type
 
 Follow me on Twitter: ![Twitter Follow](https://img.shields.io/twitter/follow/jefflaporte)
 
-
 ## <a name="installation"></a>Installation
 
-[DeepKit]([url](https://github.com/deepkit/deepkit-framework)) is required in order to provide runtime type information on your functions and types.
+[DeepKit](<[url](https://github.com/deepkit/deepkit-framework)>) is required in order to provide runtime type information on your functions and types.
 
 ```sh
 npm install @typeai/core @deepkit/core
 ```
+
 > NOTE: For now, automatic extraction of JSDoc @description tags requires these
 > forked npm package builds @deepkit/type and @deepkit/type-compiler
 
 ```sh
-npm install @deepkit/type@npm:@jefflaporte/deepkit-type-compiler@1.0.1-alpha.97-jl
-npm install --save-dev @deepkit/type@npm:@jefflaporte/deepkit-type-compiler@1.0.1-alpha.97-jl
+npm install @deepkit/type@npm:@jefflaporte/deepkit-type@1.0.1-alpha.97-jl
+npm install --save-dev @deepkit/type-compiler@npm:@jefflaporte/deepkit-type-compiler@1.0.1-alpha.97-jl
 ./node_modules/.bin/deepkit-type-install
 ```
 
