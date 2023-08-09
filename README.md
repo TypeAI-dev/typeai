@@ -52,15 +52,15 @@ Follow me on Twitter: ![Twitter Follow](https://img.shields.io/twitter/follow/je
 
 ## <a name="installation"></a>Installation
 
+[DeepKit]([url](https://github.com/deepkit/deepkit-framework)) is required in order to provide runtime type information on your functions and types.
+
 ```sh
-npm install @typeai/core
+npm install @typeai/core @deepkit/core
+```
+> NOTE: For now, automatic extraction of JSDoc @description tags requires these
+> forked npm package builds @deepkit/type and @deepkit/type-compiler
 
-# DeepKit is required in order to provide runtime type information on your functions and types.
-# Set it up like this:
-npm install @deepkit/core
-
-# NOTE: For now automatic extraction of JSDoc @description tags requires
-#       these forked npm package builds @deepkit/type and @deepkit/type-compiler
+```sh
 npm install @deepkit/type@npm:@jefflaporte/deepkit-type-compiler@1.0.1-alpha.97-jl
 npm install --save-dev @deepkit/type@npm:@jefflaporte/deepkit-type-compiler@1.0.1-alpha.97-jl
 ./node_modules/.bin/deepkit-type-install
