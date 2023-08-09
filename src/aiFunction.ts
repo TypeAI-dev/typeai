@@ -94,6 +94,7 @@ const _infer = async <T, R>(
 
 export type ToAIFunctionOptions = {
   model?: string
+  registry?: SchemaRegistry
 }
 export type AIFunctionOptions = {
   model?: string
@@ -175,7 +176,7 @@ export function toAIFunctionViaRuntimeTypes<T, R>(
   debug(`rType: ${util.inspect(rType, { depth: 8 })}`)
 
   // Build JSON schema description of submitLLMGeneratedData
-  const registry = new SchemaRegistry()
+  const registry = toAIFunctionOptions?.registry || SchemaRegistry.getInstance()
   const resolver = new TypeSchemaResolver(rType, registry)
   resolver.resolve()
   const rKey = registry.getTypeKey(rType)

@@ -20,12 +20,12 @@ export type Components = {
 
 export const handleToolUse = async function (
   openAIClient: OpenAIApi,
-  schemaRegistry: SchemaRegistry,
   messages: ChatCompletionRequestMessage[],
   responseData: CreateChatCompletionResponse,
-  options?: { model?: string },
+  options?: { model?: string; registry?: SchemaRegistry },
 ): Promise<CreateChatCompletionResponse | undefined> {
   const message = responseData.choices[0].message
+  const schemaRegistry = options?.registry || SchemaRegistry.getInstance()
 
   if (message?.function_call) {
     debug(`function_call: ${JSON.stringify(message.function_call, null, 2)}`)
@@ -64,24 +64,25 @@ export const handleToolUse = async function (
 }
 
 export class ToolFunction {
-  schemaRegistry: SchemaRegistry
+  schemaRegistry: SchemaRegistry = SchemaRegistry.getInstance()
   errors: DeepKitTypeError[] = []
   // eslint-disable-next-line @typescript-eslint/ban-types
   fn: Function
   $defs: Map<string, JSONSchema> = new Map()
+  _schema?: JSONSchemaOpenAIFunction
 
   constructor(
     // eslint-disable-next-line @typescript-eslint/ban-types
     fn: Function,
-    public schemaRegisty: SchemaRegistry,
+    schemaRegisty: SchemaRegistry,
   ) {
     this.fn = fn
-    this.schemaRegistry = schemaRegisty
+    this.schemaRegistry = schemaRegisty || this.schemaRegistry
   }
 
-  static fromFunction<R>(fn: (...args: any[]) => R): ToolFunction {
+  static fromFunction<R>(fn: (...args: any[]) => R, schemaRegistry?: SchemaRegistry): ToolFunction {
     const reflectFn = ReflectionFunction.from(fn)
-    const registry = new SchemaRegistry()
+    const registry = schemaRegistry || SchemaRegistry.getInstance()
     const resolver = new TypeSchemaResolver(reflectFn.type, registry)
     resolver.resolve()
     const oaif = new ToolFunction(fn, registry)
@@ -89,10 +90,19 @@ export class ToolFunction {
   }
 
   get schema(): JSONSchemaOpenAIFunction {
-    return this.serialize()
+    this._schema = this._schema || this.serialize()
+    return this._schema
   }
   get registry(): SchemaRegistry {
     return this.schemaRegistry
+  }
+
+  get name(): string {
+    return this.fn.name
+  }
+
+  get description(): string {
+    return this.schema.description || ''
   }
 
   registerDef(name: string, schema?: JSONSchema) {

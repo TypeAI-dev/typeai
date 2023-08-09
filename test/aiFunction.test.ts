@@ -1,3 +1,4 @@
+import { SchemaRegistry } from '../src/SchemaRegistry'
 import { toAIFunction } from '../src/aiFunction'
 import Debug from 'debug'
 const debug = Debug('test')
@@ -16,6 +17,7 @@ describe('Build a magic AI function from a function stub', () => {
     const score2 = await sentiment("I can't stand that movie.")
     debug(`sentiment: score:${score2} text:"I can't stand that movie."`)
     expect(score2).toBeLessThan(-0.5)
+    SchemaRegistry.resetInstance()
   }, 20000)
 
   test('it should work with object-typed single-parameter functions', async () => {
@@ -30,6 +32,7 @@ describe('Build a magic AI function from a function stub', () => {
     debug(`listFruit: n:5 color:yellow results:${fruits}`)
     expect(f.length).toEqual(5)
     expect(f.every(f => potentialYellowFruits.includes(f))).toEqual(true)
+    SchemaRegistry.resetInstance()
   }, 20000)
 
   test('it should work with functions that return object-typed values', async () => {
@@ -46,6 +49,7 @@ describe('Build a magic AI function from a function stub', () => {
     const synonyms = await generateSynonymsForWords(['clear', 'yellow', 'tasty', 'changable'])
     debug(`synonyms: ${JSON.stringify(synonyms, null, 2)}`)
     expect(synonyms.length).toEqual(4)
+    SchemaRegistry.resetInstance()
   }, 20000)
 
   test('it should work with functions that return object-typed values', async () => {
@@ -63,5 +67,6 @@ describe('Build a magic AI function from a function stub', () => {
 
     const organism = await getOrganismInfo('the plant that produces espresso beans')
     debug(`organism: ${JSON.stringify(organism, null, 2)}`)
+    SchemaRegistry.resetInstance()
   }, 20000)
 })

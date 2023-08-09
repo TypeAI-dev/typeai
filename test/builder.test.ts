@@ -46,10 +46,10 @@ describe('Build JSON schema description of a TypeScript function', () => {
       return weatherInfo
     }
 
-    const reg = new SchemaRegistry()
-    const tsr = new TypeSchemaResolver(getFunctionTypeInfo(getCurrentWeather), reg)
+    const registry = new SchemaRegistry()
+    const tsr = new TypeSchemaResolver(getFunctionTypeInfo(getCurrentWeather), registry)
     tsr.resolve()
-    const oaif = new ToolFunction(getCurrentWeather, reg)
+    const oaif = new ToolFunction(getCurrentWeather, registry)
     const doc = oaif.serialize()
     debug(JSON.stringify(doc, null, 2))
 

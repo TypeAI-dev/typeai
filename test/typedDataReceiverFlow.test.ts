@@ -59,7 +59,7 @@ describe('Perform a round trip test with the OpenAI API', () => {
     const responseWithFnUse = await openai.createChatCompletion(ccr)
 
     // Handle function use by the LLM
-    const responseData = await handleToolUse(openai, registry, messages, responseWithFnUse.data)
+    const responseData = await handleToolUse(openai, messages, responseWithFnUse.data, { registry })
     const result = responseData?.choices[0].message
     debug(`responseData: ${JSON.stringify(responseData, null, 2)}`)
     debug(`Final result: ${JSON.stringify(result, null, 2)}`)

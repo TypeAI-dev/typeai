@@ -188,10 +188,9 @@ TypeAI provides two functions that make exposing your function to GPT-3.5/4 and 
 ToolFunction.fromFunction<R>(fn: (...args: any[]) => R): ToolFunction
 function handleToolUse(
   openAIClient: OpenAIApi,
-  schemaRegistry: SchemaRegistry,
   messages: ChatCompletionRequestMessage[],
   responseData: CreateChatCompletionResponse,
-  options?: { model?: string },
+  options?: { model?: string, registry?: SchemaRegistry },
 ): Promise<CreateChatCompletionResponse | undefined>
 ```
 
@@ -235,7 +234,7 @@ const responseWithFnUse = await openai.createChatCompletion(ccr)
 // Transparently handle any LLM calls to your function.
 // handleToolUse() returns OpenAI's final response after
 // any/all function calls have been completed
-const responseData = await handleToolUse(openai, registry, messages, responseWithFnUse.data)
+const responseData = await handleToolUse(openai, messages, responseWithFnUse.data)
 
 const result = responseData?.choices[0].message
 
@@ -299,7 +298,7 @@ const ccr: CreateChatCompletionRequest = {
   max_tokens: 1000,
 }
 const responseWithFunctionUse = await openai.createChatCompletion(ccr)
-const responseData = await handleToolUse(openai, registry, messages, responseWithFunctionUse.data)
+const responseData = await handleToolUse(openai, messages, responseWithFunctionUse.data)
 const result = responseData?.choices[0].message
 console.log(`LLM final result: ${JSON.stringify(result, null, 2)}`)
 ```

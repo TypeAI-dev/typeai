@@ -27,6 +27,14 @@ export interface SchemeEntry {
 export type RegistableSchema = TypeClass | TypeObjectLiteral | TypeEnum | TypeUnion | TypeFunction
 
 export class SchemaRegistry {
+  static _instance?: SchemaRegistry
+  static getInstance(): SchemaRegistry {
+    return this._instance || (this._instance = new SchemaRegistry())
+  }
+  static resetInstance() {
+    this._instance = undefined
+  }
+
   store: Map<string, SchemeEntry> = new Map()
 
   getSchemaKey(t: RegistableSchema): string {
