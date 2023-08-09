@@ -1,6 +1,6 @@
 import { TypeObjectLiteral, TypePropertySignature, typeOf } from '@deepkit/type'
 import { Description, getMetaDescription } from '../src/types'
-import { generateLLMFunction } from '../src/generateLLMFunction'
+import { ToolFunction } from '../src/ToolFunction'
 import * as util from 'util'
 import Debug from 'debug'
 const debug = Debug('test')
@@ -35,7 +35,8 @@ describe('Descriptions via annotation types', () => {
       return 'OK'
     }
 
-    const { schema: jsonSchema } = generateLLMFunction(inferredOrganismSpec)
+    const inferredOrganismTool = ToolFunction.fromFunction(inferredOrganismSpec)
+    const jsonSchema = inferredOrganismTool.schema
     const organismProps = jsonSchema.parameters?.$defs?.Organism?.properties
     expect(organismProps?.species?.description).toEqual('desc1')
     expect(organismProps?.genus?.description).toEqual('desc2')

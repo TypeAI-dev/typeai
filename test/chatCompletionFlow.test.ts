@@ -1,5 +1,5 @@
-import { handleLLMFunctionUse } from '../src/OpenAIFunction'
-import { generateLLMFunction } from '../src/generateLLMFunction'
+import { handleToolUse } from '../src/ToolFunction'
+import { ToolFunction } from '../src/ToolFunction'
 import {
   CreateChatCompletionRequest,
   ChatCompletionRequestMessage,
@@ -51,7 +51,8 @@ describe('Perform a round trip test with the OpenAI API', () => {
 
   test('it should work', async () => {
     // Build JSON schema description of the test function
-    const { schema: jsonSchemaGetCurrentWeather } = generateLLMFunction(getCurrentWeather)
+    const getCurrentWeatherTool = ToolFunction.fromFunction(getCurrentWeather)
+    const jsonSchemaGetCurrentWeather = getCurrentWeatherTool.schema
     const functionMap = {
       getCurrentWeather: getCurrentWeather,
     }
@@ -103,9 +104,10 @@ describe('Perform a round trip test with the OpenAI API', () => {
     expect(1).toEqual(1)
   }, 30000)
 
-  test('it should work using handleLLMFunctionUse', async () => {
+  test('it should work using handleToolUse', async () => {
     // Build JSON schema description of the test function
-    const { registry, schema: jsonSchemaGetCurrentWeather } = generateLLMFunction(getCurrentWeather)
+    const getCurrentWeatherTool = ToolFunction.fromFunction(getCurrentWeather)
+    const { registry, schema: jsonSchemaGetCurrentWeather } = getCurrentWeatherTool
 
     // Run a completion series
     const messages: ChatCompletionRequestMessage[] = [
@@ -123,12 +125,7 @@ describe('Perform a round trip test with the OpenAI API', () => {
     }
     const responseWithFnUse = await openai.createChatCompletion(ccr)
     debug(`API responseWithFnUse: ${JSON.stringify(responseWithFnUse.data, null, 2)}`)
-    const responseData = await handleLLMFunctionUse(
-      openai,
-      registry,
-      messages,
-      responseWithFnUse.data,
-    )
+    const responseData = await handleToolUse(openai, registry, messages, responseWithFnUse.data)
     const result = responseData?.choices[0].message
     debug(`API final result: ${JSON.stringify(result, null, 2)}`)
   }, 30000)

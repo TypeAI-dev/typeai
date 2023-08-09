@@ -1,5 +1,5 @@
-import { handleLLMFunctionUse } from '../src/OpenAIFunction'
-import { generateLLMFunction } from '../src/generateLLMFunction'
+import { handleToolUse } from '../src/ToolFunction'
+import { ToolFunction } from '../src/ToolFunction'
 import {
   CreateChatCompletionRequest,
   ChatCompletionRequestMessage,
@@ -28,7 +28,7 @@ describe('Perform a round trip test with the OpenAI API', () => {
     openai = new OpenAIApi(configuration)
   })
 
-  test('it should work using handleLLMFunctionUse', async () => {
+  test('it should work using handleToolUse', async () => {
     let citiesDataResponse: CityData[] = []
     const submitLLMGeneratedData = function submitLLMGeneratedData(citiesData: CityData[]): string {
       debug(`citiesData: ${JSON.stringify(citiesData, null, 2)}`)
@@ -37,8 +37,8 @@ describe('Perform a round trip test with the OpenAI API', () => {
     }
 
     // Build JSON schema description of the test function
-    const { registry, schema: jsonSchemaSubmitLLMGeneratedData } =
-      generateLLMFunction(submitLLMGeneratedData)
+    const submitLLMGeneratedDataTool = ToolFunction.fromFunction(submitLLMGeneratedData)
+    const { registry, schema: jsonSchemaSubmitLLMGeneratedData } = submitLLMGeneratedDataTool
 
     // Run a completion series
     const messages: ChatCompletionRequestMessage[] = [
@@ -59,12 +59,7 @@ describe('Perform a round trip test with the OpenAI API', () => {
     const responseWithFnUse = await openai.createChatCompletion(ccr)
 
     // Handle function use by the LLM
-    const responseData = await handleLLMFunctionUse(
-      openai,
-      registry,
-      messages,
-      responseWithFnUse.data,
-    )
+    const responseData = await handleToolUse(openai, registry, messages, responseWithFnUse.data)
     const result = responseData?.choices[0].message
     debug(`responseData: ${JSON.stringify(responseData, null, 2)}`)
     debug(`Final result: ${JSON.stringify(result, null, 2)}`)

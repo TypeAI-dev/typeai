@@ -185,8 +185,8 @@ _See:_
 TypeAI provides two functions that make exposing your function to GPT-3.5/4 and handling the resulting function call requests from GPT-3/4 transparent:
 
 ```typescript
-function generateLLMToolFunction<R>(fn: (...args: any[]) => R): LLMToolFunctionInfo
-function handleLLMToolFunctionUse(
+ToolFunction.fromFunction<R>(fn: (...args: any[]) => R): ToolFunction
+function handleToolUse(
   openAIClient: OpenAIApi,
   schemaRegistry: SchemaRegistry,
   messages: ChatCompletionRequestMessage[],
@@ -205,7 +205,7 @@ import {
   ChatCompletionRequestMessage,
   ChatCompletionRequestMessageRoleEnum,
 } from 'openai'
-import { generateLLMFunction, handleLLMToolFunctionUse } from '@typeai/core'
+import { ToolFunction, handleToolUse } from '@typeai/core'
 import { getCurrentWeather } from 'yourModule'
 
 // Init OpenAI client
@@ -213,7 +213,8 @@ const configuration = new Configuration({ apiKey: process.env.OPENAI_API_KEY })
 const openai = new OpenAIApi(configuration)
 
 // Generate JSON Schema for function and dependent types
-const { registry, schema: getCurrentWeatherJSONSchema } = generateLLMToolFunction(getCurrentWeather)
+const getCurrentWeatherTool = ToolFunction.fromFunction(getCurrentWeather)
+const getCurrentWeatherJSONSchema = getCurrentWeatherTool.schema
 
 // Run a chat completion sequence
 const messages: ChatCompletionRequestMessage[] = [
@@ -232,9 +233,9 @@ const ccr: CreateChatCompletionRequest = {
 const responseWithFnUse = await openai.createChatCompletion(ccr)
 
 // Transparently handle any LLM calls to your function.
-// handleLLMFunctionUse() returns OpenAI's final response after
+// handleToolUse() returns OpenAI's final response after
 // any/all function calls have been completed
-const responseData = await handleLLMFunctionUse(openai, registry, messages, responseWithFnUse.data)
+const responseData = await handleToolUse(openai, registry, messages, responseWithFnUse.data)
 
 const result = responseData?.choices[0].message
 
@@ -256,7 +257,7 @@ This results in a coding experience that feels "native".
 _Example_
 
 ```typescript
-import { generateLLMFunction, handleLLMFunctionUse } from '@typeai/core'
+import { ToolFunction, handleToolUse } from '@typeai/core'
 
 // Your type definitions
 // ...
@@ -280,7 +281,8 @@ const getCurrentWeather = function getCurrentWeather(
 }
 
 // Register your function and type info
-const { registry, schema: jsonSchemaGetCurrentWeather } = generateLLMFunction(getCurrentWeather)
+const getCurrentWeatherTool = ToolFunction.fromFunction(getCurrentWeather)
+const jsonSchemaGetCurrentWeather = getCurrentWeatherTool.schema
 
 // Run a completion series
 const messages: ChatCompletionRequestMessage[] = [
@@ -297,12 +299,7 @@ const ccr: CreateChatCompletionRequest = {
   max_tokens: 1000,
 }
 const responseWithFunctionUse = await openai.createChatCompletion(ccr)
-const responseData = await handleLLMFunctionUse(
-  openai,
-  registry,
-  messages,
-  responseWithFunctionUse.data,
-)
+const responseData = await handleToolUse(openai, registry, messages, responseWithFunctionUse.data)
 const result = responseData?.choices[0].message
 console.log(`LLM final result: ${JSON.stringify(result, null, 2)}`)
 ```

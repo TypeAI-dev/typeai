@@ -1,6 +1,6 @@
 import { SchemaRegistry } from '../src/SchemaRegistry'
 import { TypeSchemaResolver, getFunctionTypeInfo } from '../src/TypeSchemaResolver'
-import { OpenAIFunction } from '../src/OpenAIFunction'
+import { ToolFunction } from '../src/ToolFunction'
 import Debug from 'debug'
 const debug = Debug('test')
 
@@ -49,7 +49,7 @@ describe('Build JSON schema description of a TypeScript function', () => {
     const reg = new SchemaRegistry()
     const tsr = new TypeSchemaResolver(getFunctionTypeInfo(getCurrentWeather), reg)
     tsr.resolve()
-    const oaif = new OpenAIFunction(getCurrentWeather, reg)
+    const oaif = new ToolFunction(getCurrentWeather, reg)
     const doc = oaif.serialize()
     debug(JSON.stringify(doc, null, 2))
 

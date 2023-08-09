@@ -15,7 +15,7 @@ import { serialize, getSchema } from './utils'
 import { SchemaRegistry, SchemeEntry } from '../src/SchemaRegistry'
 import { TypeSchemaResolver } from '../src/TypeSchemaResolver'
 import { JSONSchema, JSONSchemaOpenAIFunction } from './types'
-import { generateLLMFunction } from '../src/generateLLMFunction'
+import { ToolFunction } from './ToolFunction'
 import Debug from 'debug'
 import * as util from 'util'
 const debug = Debug('typeai')
@@ -121,11 +121,13 @@ export function toAIFunction<T, R>(
   }
 
   // Build JSON schema description of wrapped function
-  const { schema: wrappedFnJSONSchema } = generateLLMFunction(f)
+  const wrappedFnTool = ToolFunction.fromFunction(f)
+  const wrappedFnJSONSchema = wrappedFnTool.schema
   const inputJSONSchema = wrappedFnJSONSchema.parameters?.properties
 
   // Build JSON schema description of submitLLMGeneratedData
-  const { schema: jsonSchemaSubmitGeneratedData } = generateLLMFunction(submitLLMGeneratedData)
+  const submitLLMGeneratedDataTool = ToolFunction.fromFunction(submitLLMGeneratedData)
+  const submitGeneratedDataSchema = submitLLMGeneratedDataTool.schema
 
   // Magic function
   type MagicAIFunction = {
@@ -144,7 +146,7 @@ export function toAIFunction<T, R>(
     const res = await _infer(
       purpose,
       fnSignature,
-      jsonSchemaSubmitGeneratedData,
+      submitGeneratedDataSchema,
       inputJSONSchema,
       input,
       options,
@@ -182,7 +184,7 @@ export function toAIFunctionViaRuntimeTypes<T, R>(
   const rSchema = serialize(schema)
   debug(`registry.store: ${util.inspect(registry.store, { depth: 8 })}`)
 
-  const jsonSchemaSubmitGeneratedData: JSONSchemaOpenAIFunction = {
+  const submitGeneratedDataSchema: JSONSchemaOpenAIFunction = {
     name: 'submitLLMGeneratedData',
     parameters: {
       type: 'object',
@@ -210,7 +212,7 @@ export function toAIFunctionViaRuntimeTypes<T, R>(
     const res = await _infer(
       purpose,
       signature,
-      jsonSchemaSubmitGeneratedData,
+      submitGeneratedDataSchema,
       inputJSONSchema,
       input,
       options,

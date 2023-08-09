@@ -1,5 +1,7 @@
 import { DeepKitTypeError } from './errors'
 import { SchemaRegistry } from './SchemaRegistry'
+import { ReflectionFunction } from '@deepkit/type'
+import { TypeSchemaResolver } from './TypeSchemaResolver'
 import { Schema } from './types'
 import cloneDeepWith from 'lodash/cloneDeepWith'
 import { JSONSchemaOpenAIFunction, JSONSchema, JSONSchemaTypeString, JSONSchemaEnum } from './types'
@@ -16,7 +18,7 @@ export type Components = {
   schemas?: Record<string, Schema>
 }
 
-export const handleLLMFunctionUse = async function (
+export const handleToolUse = async function (
   openAIClient: OpenAIApi,
   schemaRegistry: SchemaRegistry,
   messages: ChatCompletionRequestMessage[],
@@ -61,7 +63,7 @@ export const handleLLMFunctionUse = async function (
   }
 }
 
-export class OpenAIFunction {
+export class ToolFunction {
   schemaRegistry: SchemaRegistry
   errors: DeepKitTypeError[] = []
   // eslint-disable-next-line @typescript-eslint/ban-types
@@ -75,6 +77,22 @@ export class OpenAIFunction {
   ) {
     this.fn = fn
     this.schemaRegistry = schemaRegisty
+  }
+
+  static fromFunction<R>(fn: (...args: any[]) => R): ToolFunction {
+    const reflectFn = ReflectionFunction.from(fn)
+    const registry = new SchemaRegistry()
+    const resolver = new TypeSchemaResolver(reflectFn.type, registry)
+    resolver.resolve()
+    const oaif = new ToolFunction(fn, registry)
+    return oaif
+  }
+
+  get schema(): JSONSchemaOpenAIFunction {
+    return this.serialize()
+  }
+  get registry(): SchemaRegistry {
+    return this.schemaRegistry
   }
 
   registerDef(name: string, schema?: JSONSchema) {
