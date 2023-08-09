@@ -1,5 +1,7 @@
 {
-  "eslint.workingDirectories": ["./src"],
+  "eslint.workingDirectories": [
+    "./src"
+  ],
   "typescript.tsdk": "node_modules/typescript/lib",
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
@@ -9,5 +11,7 @@
   "[typecript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "npm.packageManager": "pnpm"
+  "npm.packageManager": "pnpm",
+  "jest.jestCommandLine": "pnpm test-op --",
+  "jest.autoRun": "off"
 }

@@ -3,7 +3,7 @@
   "version": "0.5.1",
   "description": "An AI Engineering Framework for TypeScript",
   "author": "Jeff LaPorte (https://github.com/jefflaporte)",
-  "repository": "https://github.com/TypeAI-dev/typeai-core",
+  "repository": "https://github.com/TypeAI-dev/typeai",
   "private": false,
   "license": "SEE LICENSE IN LICENSE.txt",
   "type": "module",
@@ -24,7 +24,7 @@
     "prepare": "./node_modules/.bin/deepkit-type-install",
     "prepublishOnly": "pnpm run build",
     "test": "jest --setupFiles 'dotenv/config'",
-    "test-op": "op run --env-file=.env jest -- --color"
+    "test-op": "op run --env-file=.env jest"
   },
   "publishConfig": {
     "access": "public"
@@ -46,7 +46,7 @@
     "LICENSE.txt"
   ],
   "bugs": {
-    "url": "https://github.com/TypeAI-dev/core/issues/new?template=bug_report.md"
+    "url": "https://github.com/TypeAI-dev/typeai/issues/new?template=bug_report.md"
   },
   "devDependencies": {
     "@deepkit/type-compiler": "npm:@jefflaporte/deepkit-type-compiler@1.0.1-alpha.97-jl",
