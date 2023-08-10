@@ -734,7 +734,7 @@ packages:
     dev: true
 
   /@jefflaporte/deepkit-type-compiler@1.0.1-alpha.97-jl(typescript@4.8.4):
-    resolution: {integrity: sha512-V/DKHII1n3C7CoxNjIMBLXWWCB6rcRQhh7l+Wb07WHJ6FYnslz5OZ6tiIQiywZZlC4nGxCzwjXQUaPLxxNpfxw==, tarball: https://npm.pkg.github.com/download/@jefflaporte/deepkit-type-compiler/1.0.1-alpha.97-jl/b09ea7bb5306512dfa9781fdeae56d6f8382d89f}
+    resolution: {integrity: sha512-NV8YKVXcqice1LhNEfb4UWl8thTH0BV4lrRqFcrfQh8dqVecFl5AqRZkhyFjoBsDBeVWJJwaCyd6tKePZMz0vQ==}
     hasBin: true
     requiresBuild: true
     peerDependencies:
@@ -753,7 +753,7 @@ packages:
     dev: true
 
   /@jefflaporte/deepkit-type@1.0.1-alpha.97-jl(@deepkit/core@1.0.1-alpha.97):
-    resolution: {integrity: sha512-0exyyx4E+E0tD6NRGeVCZqe7/q8mhE1AoatYyDiQVO5SX3QM2TdVt0xihCws5Fb7PzrwRDXUQYOeYS0SeIAmNg==, tarball: https://npm.pkg.github.com/download/@jefflaporte/deepkit-type/1.0.1-alpha.97-jl/8950c74b06d8e04fe449245c5fd4e2b905d9d3b6}
+    resolution: {integrity: sha512-OXIT1Gz8AUYAtx/O/DJCZ8Ao0J2HjKsjhrBitz2beIY3tV8zHscLSdr/Zym19i3th2M+gSsr4qZoHqW1aUOcmA==}
     peerDependencies:
       '@deepkit/core': ^1.0.1-alpha.13
     dependencies:
