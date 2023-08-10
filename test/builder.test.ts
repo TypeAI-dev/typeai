@@ -1,10 +1,17 @@
+import { ReflectionFunction } from '@deepkit/type'
 import { SchemaRegistry } from '../src/SchemaRegistry'
-import { TypeSchemaResolver, getFunctionTypeInfo } from '../src/TypeSchemaResolver'
+import { TypeSchemaResolver } from '../src/TypeSchemaResolver'
 import { ToolFunction } from '../src/ToolFunction'
 import Debug from 'debug'
 const debug = Debug('test')
 
 describe('Build JSON schema description of a TypeScript function', () => {
+  // type Aircraft = {
+  //   manufacturer: string
+  //   type: 'fixed-wing' | 'rotary-wing'
+  //   application: 'military' | 'civilian'
+  // }
+
   test('it should generate a correct description', async () => {
     // https://json-schema.org/specification-links.html#2020-12
 
@@ -47,7 +54,8 @@ describe('Build JSON schema description of a TypeScript function', () => {
     }
 
     const registry = new SchemaRegistry()
-    const tsr = new TypeSchemaResolver(getFunctionTypeInfo(getCurrentWeather), registry)
+    const rfn = ReflectionFunction.from(getCurrentWeather)
+    const tsr = new TypeSchemaResolver(rfn.type, registry)
     tsr.resolve()
     const oaif = new ToolFunction(getCurrentWeather, registry)
     const doc = oaif.serialize()

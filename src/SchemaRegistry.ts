@@ -105,7 +105,7 @@ export class SchemaRegistry {
     if (currentEntry.type.kind !== ReflectionKind.function) {
       throw new Error(`Schema ${name} is not a function`)
     }
-    debug(`SchemaRegistry.getFunction: ${util.inspect(currentEntry)}`)
+    // debug(`SchemaRegistry.getFunction: ${util.inspect(currentEntry)}`)
 
     return currentEntry.type.function
   }

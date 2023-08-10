@@ -12,18 +12,11 @@ import {
   TypeLiteral,
   TypeObjectLiteral,
   TypeParameter,
-  typeOf,
 } from '@deepkit/type'
 import { getParentClass } from '@deepkit/core'
 import { SchemaRegistry } from './SchemaRegistry'
 import Debug from 'debug'
 const debug = Debug('typeai')
-
-// eslint-disable-next-line @typescript-eslint/ban-types
-export const getFunctionTypeInfo = (f: any): Type => {
-  // return typeOf<typeof f>()
-  return typeOf(undefined, f)
-}
 
 // See DeepKit type reflection
 // https://github.com/deepkit/deepkit-framework/blob/master/packages/type/src/reflection/reflection.ts

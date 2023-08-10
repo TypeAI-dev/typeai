@@ -1,16 +1,17 @@
-import { SchemaRegistry } from './SchemaRegistry'
-import { TypeSchemaResolver, getFunctionTypeInfo } from './TypeSchemaResolver'
-import { handleToolUse, ToolFunction } from './ToolFunction'
+import { toAIModel } from './aiModel'
 import { toAIFunction } from './aiFunction'
 import { toAIClassifier } from './aiClassifier'
+import { ToolFunction, handleToolUse } from './ToolFunction'
+import { SchemaRegistry } from './SchemaRegistry'
+import { TypeSchemaResolver } from './TypeSchemaResolver'
 import type { Description } from './types'
 
 export {
+  toAIModel,
   toAIFunction,
   toAIClassifier,
-  handleToolUse,
-  getFunctionTypeInfo,
   ToolFunction,
+  handleToolUse,
   SchemaRegistry,
   TypeSchemaResolver,
   Description,

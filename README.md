@@ -192,6 +192,7 @@ ToolFunction.from<R>(fn: (...args: any[]) => R): ToolFunction
 function handleToolUse(
   openAIClient: OpenAIApi,
   messages: ChatCompletionRequestMessage[],
+  originalRequest: CreateChatCompletionRequest,
   responseData: CreateChatCompletionResponse,
   options?: { model?: string, registry?: SchemaRegistry },
 ): Promise<CreateChatCompletionResponse | undefined>
@@ -216,7 +217,6 @@ const openai = new OpenAIApi(configuration)
 
 // Generate JSON Schema for function and dependent types
 const getCurrentWeatherTool = ToolFunction.from(getCurrentWeather)
-const getCurrentWeatherJSONSchema = getCurrentWeatherTool.schema
 
 // Run a chat completion sequence
 const messages: ChatCompletionRequestMessage[] = [
@@ -225,10 +225,10 @@ const messages: ChatCompletionRequestMessage[] = [
     content: "What's the weather like in Boston? Say it like a weather reporter.",
   },
 ]
-const ccr: CreateChatCompletionRequest = {
+const request: CreateChatCompletionRequest = {
   model: 'gpt-3.5-turbo',
   messages,
-  functions: [getCurrentWeatherJSONSchema],
+  functions: [getCurrentWeatherTool.schema],
   stream: false,
   max_tokens: 1000,
 }
@@ -237,8 +237,7 @@ const responseWithFnUse = await openai.createChatCompletion(ccr)
 // Transparently handle any LLM calls to your function.
 // handleToolUse() returns OpenAI's final response after
 // any/all function calls have been completed
-const responseData = await handleToolUse(openai, messages, responseWithFnUse.data)
-
+const responseData = await handleToolUse(openai, messages, request, responseWithFnUse.data)
 const result = responseData?.choices[0].message
 
 /*
@@ -284,7 +283,6 @@ const getCurrentWeather = function getCurrentWeather(
 
 // Register your function and type info
 const getCurrentWeatherTool = ToolFunction.from(getCurrentWeather)
-const jsonSchemaGetCurrentWeather = getCurrentWeatherTool.schema
 
 // Run a completion series
 const messages: ChatCompletionRequestMessage[] = [
@@ -293,15 +291,15 @@ const messages: ChatCompletionRequestMessage[] = [
     content: "What's the weather like in Boston? Say it like a weather reporter.",
   },
 ]
-const ccr: CreateChatCompletionRequest = {
+const request: CreateChatCompletionRequest = {
   model: 'gpt-3.5-turbo-0613',
   messages,
-  functions: [jsonSchemaGetCurrentWeather],
+  functions: [getCurrentWeatherTool.schema],
   stream: false,
   max_tokens: 1000,
 }
 const responseWithFunctionUse = await openai.createChatCompletion(ccr)
-const responseData = await handleToolUse(openai, messages, responseWithFunctionUse.data)
+const responseData = await handleToolUse(openai, messages, request, responseWithFunctionUse.data)
 const result = responseData?.choices[0].message
 console.log(`LLM final result: ${JSON.stringify(result, null, 2)}`)
 ```

@@ -1,9 +1,14 @@
+import { encode, decode } from 'gpt-tokenizer'
 import { SchemaRegistry, SchemeEntry } from './SchemaRegistry'
 import cloneDeepWith from 'lodash/cloneDeepWith'
 import { JSONSchema, JSONSchemaTypeString, JSONSchemaEnum, Schema } from './types'
 // import * as util from 'util'
 // import Debug from 'debug'
 // const debug = Debug('typeai')
+
+export const truncateByTokens = (text: string, maxTokens: number): string => {
+  return decode(encode(text).slice(0, maxTokens))
+}
 
 function schemaToJSONSchema(schema: Schema): JSONSchema {
   const jsonSchema: JSONSchema = {

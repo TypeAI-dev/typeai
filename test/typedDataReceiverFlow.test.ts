@@ -48,7 +48,7 @@ describe('Perform a round trip test with the OpenAI API', () => {
           'Generate data for the 10 largest world cities and provide your results via the submitGeneratedData function. When you call submitGeneratedData, you must minify the JSON in the arguments, ie: no extra whitespace, and no newlines.',
       },
     ]
-    const ccr: CreateChatCompletionRequest = {
+    const request: CreateChatCompletionRequest = {
       model: 'gpt-3.5-turbo-0613',
       messages,
       functions: [jsonSchemaSubmitLLMGeneratedData],
@@ -56,10 +56,12 @@ describe('Perform a round trip test with the OpenAI API', () => {
       stream: false,
       max_tokens: 1000,
     }
-    const responseWithFnUse = await openai.createChatCompletion(ccr)
+    const responseWithFnUse = await openai.createChatCompletion(request)
 
     // Handle function use by the LLM
-    const responseData = await handleToolUse(openai, messages, responseWithFnUse.data, { registry })
+    const responseData = await handleToolUse(openai, messages, request, responseWithFnUse.data, {
+      registry,
+    })
     const result = responseData?.choices[0].message
     debug(`responseData: ${JSON.stringify(responseData, null, 2)}`)
     debug(`Final result: ${JSON.stringify(result, null, 2)}`)

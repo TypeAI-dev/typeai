@@ -80,10 +80,13 @@
   "dependencies": {
     "@deepkit/core": "1.0.1-alpha.97",
     "@deepkit/type": "npm:@jefflaporte/deepkit-type@1.0.1-alpha.97-jl",
+    "@types/jsdom": "^21.1.1",
     "@types/lodash": "^4.14.195",
+    "axios": "^1.4.0",
     "camelcase": "^6.3.0",
     "debug": "^4.3.4",
     "gpt-tokenizer": "^2.1.1",
+    "jsdom": "^22.1.0",
     "lodash": "^4.17.21",
     "openai": "~3.3.0"
   }

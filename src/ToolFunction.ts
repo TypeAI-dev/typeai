@@ -8,57 +8,74 @@ import { JSONSchemaOpenAIFunction, JSONSchema, JSONSchemaTypeString, JSONSchemaE
 import {
   ChatCompletionRequestMessage,
   ChatCompletionRequestMessageRoleEnum,
+  CreateChatCompletionRequest,
   CreateChatCompletionResponse,
   OpenAIApi,
 } from 'openai'
 import Debug from 'debug'
 const debug = Debug('typeai')
+const debugNet = Debug('typeai:net')
 
-export type Components = {
-  schemas?: Record<string, Schema>
+type HandleToolUseOptions = {
+  model?: string
+  registry?: SchemaRegistry
+  handle?: 'single' | 'multiple'
 }
 
 export const handleToolUse = async function (
   openAIClient: OpenAIApi,
   messages: ChatCompletionRequestMessage[],
+  originalRequest: CreateChatCompletionRequest,
   responseData: CreateChatCompletionResponse,
-  options?: { model?: string; registry?: SchemaRegistry },
+  options?: HandleToolUseOptions,
 ): Promise<CreateChatCompletionResponse | undefined> {
-  const message = responseData.choices[0].message
+  const _options = { ...options, handle: options?.handle || 'multiple' }
+
+  const currentMessage = responseData.choices[0].message
   const schemaRegistry = options?.registry || SchemaRegistry.getInstance()
 
-  if (message?.function_call) {
-    debug(`function_call: ${JSON.stringify(message.function_call, null, 2)}`)
-    const function_name = message.function_call.name as string
+  if (currentMessage?.function_call) {
+    debug(`handleToolUse: function_call: ${JSON.stringify(currentMessage.function_call, null, 2)}`)
+    const function_name = currentMessage.function_call.name as string
     const fn = schemaRegistry.getFunction(function_name)
     if (!fn) {
-      throw new Error(`function ${function_name} not found`)
+      throw new Error(`handleToolUse: function ${function_name} not found`)
     }
-    const function_args = JSON.parse(message.function_call.arguments || '')
-    debug(`function_args: ${message.function_call.arguments}`)
+    const function_args = JSON.parse(currentMessage.function_call.arguments || '')
+    debug(`handleToolUse: function_args: ${currentMessage.function_call.arguments}`)
 
     // Map args to positional args - naive for now - TODO
     const argKeys = Object.keys(function_args)
     const positionalArgs = argKeys.map(k => function_args[k])
-    const function_response = fn(...positionalArgs)
-    debug(`function_response: ${JSON.stringify(function_response, null, 2)}`)
+    const function_response = await fn(...positionalArgs)
 
     // Send function result to LLM
-    messages.push(message) // extend conversation with assistant's reply
+    messages.push(currentMessage) // extend conversation with assistant's reply
     messages.push({
       role: ChatCompletionRequestMessageRoleEnum.Function,
       name: function_name,
       content: JSON.stringify(function_response),
     })
-    debug(JSON.stringify(messages, null, 2))
-    const second_response = await openAIClient.createChatCompletion({
+    const nextRequest: CreateChatCompletionRequest = {
       model: options?.model || responseData.model,
       messages,
-    })
-    const second_message = second_response.data.choices[0].message
-    debug(`second_response: ${JSON.stringify(second_message, null, 2)}`)
-    return second_response.data
+      functions: originalRequest?.functions || [],
+    }
+    debugNet(`handleToolUse: nextRequest: ${JSON.stringify(nextRequest, null, 2)}`)
+
+    const nextResponse = await openAIClient.createChatCompletion(nextRequest)
+    debugNet(`handleToolUse: nextResponse: ${JSON.stringify(nextResponse.data, null, 2)}`)
+
+    if (nextResponse.data.choices[0]?.finish_reason === 'stop' || _options.handle === 'single') {
+      debug(
+        `handleToolUse: Completed with finish_reason:${nextResponse.data.choices[0]?.finish_reason} handle:${_options.handle}`,
+      )
+      return responseData
+    } else {
+      return handleToolUse(openAIClient, messages, originalRequest, nextResponse.data, _options)
+    }
   } else {
+    debug(`handleToolUse: Completed with no function_call`)
     return responseData
   }
 }
@@ -150,7 +167,7 @@ export class ToolFunction {
     }
 
     for (const [, schema] of this.schemaRegistry.store) {
-      if (schema.schema.type !== 'function') continue
+      if (schema.schema.type !== 'function' || schema.name != this.fn.name) continue
       functionSchema.parameters = functionSchema.parameters ?? {
         type: 'object',
         properties: {},
