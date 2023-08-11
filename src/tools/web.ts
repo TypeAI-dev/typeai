@@ -99,5 +99,13 @@ async function fetchUrl(url: string): Promise<string> {
   }
 }
 
-export const SearchWeb = ToolFunction.from(searchWeb)
-export const FetchUrl = ToolFunction.from(fetchUrl)
+export const Tools = new Map<string, ToolFunction>()
+export const registerTools = () => {
+  Tools.forEach((v, k) => {
+    Tools.delete(k)
+  })
+  Tools.set('SearchWeb', ToolFunction.from(searchWeb))
+  Tools.set('FetchUrl', ToolFunction.from(fetchUrl))
+  return Tools
+}
+registerTools()

@@ -27,6 +27,7 @@ export class TypeSchemaResolver {
   constructor(
     public t: Type,
     public schemaRegisty: SchemaRegistry,
+    public options?: { overrideName?: string },
   ) {}
 
   resolveBasic() {
@@ -141,7 +142,10 @@ export class TypeSchemaResolver {
     }
 
     // const registryKey = this.schemaRegisty.getSchemaKey(this.t)
-    const registryKey = String(typeFunction.name)
+    let registryKey: string = String(typeFunction.name)
+    if (this.options?.overrideName) {
+      registryKey = this.options.overrideName
+    }
     debug(`*** resolveFunction: registryKey: ${registryKey}`)
 
     if (registryKey) {

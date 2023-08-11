@@ -71,7 +71,7 @@ const _infer = async <T, R>(
       content: inputJSON,
     },
   ]
-  const ccr: CreateChatCompletionRequest = {
+  const request: CreateChatCompletionRequest = {
     model: options?.model || 'gpt-3.5-turbo',
     messages,
     functions: [functionJSONSchema],
@@ -80,9 +80,9 @@ const _infer = async <T, R>(
     max_tokens: 1000,
     temperature: 0,
   }
-  debugNet(`MagicAIFunction CreateChatCompletionRequest: ${JSON.stringify(ccr, null, 2)}`)
+  debugNet(`MagicAIFunction CreateChatCompletionRequest: ${JSON.stringify(request, null, 2)}`)
 
-  const response = await openai.createChatCompletion(ccr)
+  const response = await openai.createChatCompletion(request)
   debugNet(
     `MagicAIFunction CreateChatCompletionResponse: ${JSON.stringify(response.data, null, 2)}`,
   )

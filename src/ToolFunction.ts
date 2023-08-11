@@ -1,12 +1,17 @@
 import { DeepKitTypeError } from './errors'
 import { SchemaRegistry } from './SchemaRegistry'
-import { ReflectionFunction } from '@deepkit/type'
+import {
+  ReflectionFunction,
+  ReceiveType,
+  resolveReceiveType,
+  InlineRuntimeType,
+  Type,
+} from '@deepkit/type'
 import { TypeSchemaResolver } from './TypeSchemaResolver'
 import { Schema } from './types'
 import cloneDeepWith from 'lodash/cloneDeepWith'
 import { JSONSchemaOpenAIFunction, JSONSchema, JSONSchemaTypeString, JSONSchemaEnum } from './types'
 import {
-  ChatCompletionRequestMessage,
   ChatCompletionRequestMessageRoleEnum,
   CreateChatCompletionRequest,
   CreateChatCompletionResponse,
@@ -24,12 +29,12 @@ type HandleToolUseOptions = {
 
 export const handleToolUse = async function (
   openAIClient: OpenAIApi,
-  messages: ChatCompletionRequestMessage[],
   originalRequest: CreateChatCompletionRequest,
   responseData: CreateChatCompletionResponse,
   options?: HandleToolUseOptions,
 ): Promise<CreateChatCompletionResponse | undefined> {
   const _options = { ...options, handle: options?.handle || 'multiple' }
+  const messages = originalRequest.messages
 
   const currentMessage = responseData.choices[0].message
   const schemaRegistry = options?.registry || SchemaRegistry.getInstance()
@@ -72,7 +77,7 @@ export const handleToolUse = async function (
       )
       return responseData
     } else {
-      return handleToolUse(openAIClient, messages, originalRequest, nextResponse.data, _options)
+      return handleToolUse(openAIClient, originalRequest, nextResponse.data, _options)
     }
   } else {
     debug(`handleToolUse: Completed with no function_call`)
@@ -97,13 +102,44 @@ export class ToolFunction {
     this.schemaRegistry = schemaRegisty || this.schemaRegistry
   }
 
-  static from<R>(fn: (...args: any[]) => R, schemaRegistry?: SchemaRegistry): ToolFunction {
+  static from<R>(
+    fn: (...args: any[]) => R,
+    schemaRegistry?: SchemaRegistry,
+    options?: { overrideName?: string },
+  ): ToolFunction {
     const reflectFn = ReflectionFunction.from(fn)
     const registry = schemaRegistry || SchemaRegistry.getInstance()
-    const resolver = new TypeSchemaResolver(reflectFn.type, registry)
+    const resolver = new TypeSchemaResolver(reflectFn.type, registry, {
+      overrideName: options?.overrideName,
+    })
     resolver.resolve()
     const oaif = new ToolFunction(fn, registry)
     return oaif
+  }
+
+  static modelSubmissionToolFor<T>(
+    cb: (arg: T) => Promise<void>,
+    t?: ReceiveType<T>,
+  ): ToolFunction {
+    const tType = resolveReceiveType(t)
+    const modelType = tType as Type
+    const name = `submit${modelType.typeName}Data`
+
+    /** Submits generated data */
+    const submitDataSpec = function submitDataSpec(
+      data: InlineRuntimeType<typeof modelType>,
+    ): string {
+      debug(`submitData: for:${name} data:${JSON.stringify(data, null, 2)}`)
+      cb(data)
+      return '{ "status": "ok" }'
+    }
+    const fn = Object.defineProperty(submitDataSpec, 'name', {
+      value: name,
+      writable: false,
+    })
+
+    const submitDataTool = ToolFunction.from(fn, undefined, { overrideName: name })
+    return submitDataTool
   }
 
   get schema(): JSONSchemaOpenAIFunction {

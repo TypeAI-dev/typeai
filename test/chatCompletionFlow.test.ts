@@ -65,16 +65,16 @@ describe('Perform a round trip test with the OpenAI API', () => {
         content: "What's the weather like in Boston? Say it like a weather reporter.",
       },
     ]
-    const ccr: CreateChatCompletionRequest = {
+    const request: CreateChatCompletionRequest = {
       model: 'gpt-3.5-turbo-0613',
       messages,
       functions: [jsonSchemaGetCurrentWeather],
       stream: false,
       max_tokens: 1000,
     }
-    debug(JSON.stringify(ccr, null, 2))
+    debug(JSON.stringify(request, null, 2))
 
-    const response = await openai.createChatCompletion(ccr)
+    const response = await openai.createChatCompletion(request)
     const message = response.data.choices[0].message
     if (message?.function_call) {
       debug(`function_call: ${JSON.stringify(message.function_call, null, 2)}`)
@@ -123,9 +123,9 @@ describe('Perform a round trip test with the OpenAI API', () => {
       stream: false,
       max_tokens: 1000,
     }
-    const responseWithFnUse = await openai.createChatCompletion(request)
-    debug(`API responseWithFnUse: ${JSON.stringify(responseWithFnUse.data, null, 2)}`)
-    const responseData = await handleToolUse(openai, messages, request, responseWithFnUse.data, {
+    const { data: response } = await openai.createChatCompletion(request)
+    debug(`API responseWithFnUse: ${JSON.stringify(response, null, 2)}`)
+    const responseData = await handleToolUse(openai, request, response, {
       registry,
     })
     const result = responseData?.choices[0].message

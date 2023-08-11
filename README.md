@@ -185,16 +185,22 @@ _See:_
 - [OpenAI Blog: Function calling and other API updates](https://openai.com/blog/function-calling-and-other-api-updates)
 - [OpenAI API: Create Chat Completion](https://platform.openai.com/docs/api-reference/chat/create)
 
-TypeAI provides two functions that make exposing your function to GPT-3.5/4 and handling the resulting function call requests from GPT-3/4 transparent:
+TypeAI provides three functions that make exposing your function to GPT-3.5/4 and handling the resulting function call requests from GPT-3/4 transparent:
 
 ```typescript
-ToolFunction.from<R>(fn: (...args: any[]) => R): ToolFunction
+static ToolFunction.from<R>(fn: (...args: any[]) => R): ToolFunction
+
+static ToolFunction.modelSubmissionToolFor<T>(cb: (arg: T) => Promise<void>): ToolFunction
+
 function handleToolUse(
   openAIClient: OpenAIApi,
-  messages: ChatCompletionRequestMessage[],
   originalRequest: CreateChatCompletionRequest,
   responseData: CreateChatCompletionResponse,
-  options?: { model?: string, registry?: SchemaRegistry },
+  options?: {
+    model?: string,
+    registry?: SchemaRegistry,
+    handle?: 'single' | 'multiple'
+  },
 ): Promise<CreateChatCompletionResponse | undefined>
 ```
 
@@ -232,12 +238,12 @@ const request: CreateChatCompletionRequest = {
   stream: false,
   max_tokens: 1000,
 }
-const responseWithFnUse = await openai.createChatCompletion(ccr)
+const { data: response } = await openai.createChatCompletion(request)
 
 // Transparently handle any LLM calls to your function.
 // handleToolUse() returns OpenAI's final response after
 // any/all function calls have been completed
-const responseData = await handleToolUse(openai, messages, request, responseWithFnUse.data)
+const responseData = await handleToolUse(openai, request, response)
 const result = responseData?.choices[0].message
 
 /*
@@ -298,8 +304,8 @@ const request: CreateChatCompletionRequest = {
   stream: false,
   max_tokens: 1000,
 }
-const responseWithFunctionUse = await openai.createChatCompletion(ccr)
-const responseData = await handleToolUse(openai, messages, request, responseWithFunctionUse.data)
+const { data: response } = await openai.createChatCompletion(request)
+const responseData = await handleToolUse(openai, request, response)
 const result = responseData?.choices[0].message
 console.log(`LLM final result: ${JSON.stringify(result, null, 2)}`)
 ```

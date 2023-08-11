@@ -56,10 +56,10 @@ describe('Perform a round trip test with the OpenAI API', () => {
       stream: false,
       max_tokens: 1000,
     }
-    const responseWithFnUse = await openai.createChatCompletion(request)
+    const { data: response } = await openai.createChatCompletion(request)
 
     // Handle function use by the LLM
-    const responseData = await handleToolUse(openai, messages, request, responseWithFnUse.data, {
+    const responseData = await handleToolUse(openai, request, response, {
       registry,
     })
     const result = responseData?.choices[0].message

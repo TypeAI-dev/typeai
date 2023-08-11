@@ -40,7 +40,7 @@ const _infer = async (purpose: string, tStrings: string[], text: string): Promis
   const logit_bias = Object.fromEntries(
     [...Array(tStrings.length).keys()].map(k => [encode(String(k)), 100]),
   )
-  const ccr: CreateChatCompletionRequest = {
+  const request: CreateChatCompletionRequest = {
     model: 'gpt-3.5-turbo',
     messages,
     logit_bias,
@@ -48,9 +48,9 @@ const _infer = async (purpose: string, tStrings: string[], text: string): Promis
     temperature: 0,
     max_tokens: 1,
   }
-  debug(`toAIClassifier CreateChatCompletionRequest: ${JSON.stringify(ccr, null, 2)}`)
+  debug(`toAIClassifier CreateChatCompletionRequest: ${JSON.stringify(request, null, 2)}`)
 
-  const response = await openai.createChatCompletion(ccr)
+  const response = await openai.createChatCompletion(request)
   debug(`toAIClassifier CreateChatCompletionResponse: ${JSON.stringify(response.data, null, 2)}`)
 
   const index = Number(response.data.choices[0].message?.content)
