@@ -44,7 +44,7 @@ async function searchWeb(query: string): Promise<BingWebSearchResponseAbridged> 
   let result
   try {
     const response = await axios.get(url, {
-      headers: { 'Ocp-Apim-Subscription-Key': process.env.BING_SUBSCRIPTION_KEY },
+      headers: { 'Ocp-Apim-Subscription-Key': process.env.BING_API_KEY },
       responseType: 'json',
     })
     switch (response.data._type) {

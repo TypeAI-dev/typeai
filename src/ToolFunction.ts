@@ -85,6 +85,10 @@ export const handleToolUse = async function (
   }
 }
 
+type ToolFunctionFromOptions = {
+  registry?: SchemaRegistry
+  overrideName?: string
+}
 export class ToolFunction {
   schemaRegistry: SchemaRegistry = SchemaRegistry.getInstance()
   errors: DeepKitTypeError[] = []
@@ -102,13 +106,9 @@ export class ToolFunction {
     this.schemaRegistry = schemaRegisty || this.schemaRegistry
   }
 
-  static from<R>(
-    fn: (...args: any[]) => R,
-    schemaRegistry?: SchemaRegistry,
-    options?: { overrideName?: string },
-  ): ToolFunction {
+  static from<R>(fn: (...args: any[]) => R, options?: ToolFunctionFromOptions): ToolFunction {
     const reflectFn = ReflectionFunction.from(fn)
-    const registry = schemaRegistry || SchemaRegistry.getInstance()
+    const registry = options?.registry || SchemaRegistry.getInstance()
     const resolver = new TypeSchemaResolver(reflectFn.type, registry, {
       overrideName: options?.overrideName,
     })
@@ -138,7 +138,7 @@ export class ToolFunction {
       writable: false,
     })
 
-    const submitDataTool = ToolFunction.from(fn, undefined, { overrideName: name })
+    const submitDataTool = ToolFunction.from(fn, { overrideName: name })
     return submitDataTool
   }
 

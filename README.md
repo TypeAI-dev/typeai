@@ -185,12 +185,17 @@ _See:_
 - [OpenAI Blog: Function calling and other API updates](https://openai.com/blog/function-calling-and-other-api-updates)
 - [OpenAI API: Create Chat Completion](https://platform.openai.com/docs/api-reference/chat/create)
 
-TypeAI provides three functions that make exposing your function to GPT-3.5/4 and handling the resulting function call requests from GPT-3/4 transparent:
+TypeAI provides three functions that make exposing your functions and models to GPT-3.5/4, and handling the resulting function call requests from GPT-3/4, transparent:
 
 ```typescript
-static ToolFunction.from<R>(fn: (...args: any[]) => R): ToolFunction
+static ToolFunction.from<R>(
+  fn: (...args: any[]) => R,
+  options?: ToolFunctionFromOptions
+): ToolFunction
 
-static ToolFunction.modelSubmissionToolFor<T>(cb: (arg: T) => Promise<void>): ToolFunction
+static ToolFunction.modelSubmissionToolFor<T>(
+  cb: (arg: T) => Promise<void>
+): ToolFunction
 
 function handleToolUse(
   openAIClient: OpenAIApi,

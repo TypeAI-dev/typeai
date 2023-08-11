@@ -38,4 +38,5 @@ jobs:
         run: pnpm test
         env:
           CI: true
+          BING_API_KEY: ${{ secrets.BING_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
