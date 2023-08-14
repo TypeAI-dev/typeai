@@ -67,7 +67,7 @@ npm install --save-dev @deepkit/type-compiler@npm:@jefflaporte/deepkit-type-comp
 # Bash
 ./node_modules/.bin/deepkit-type-install
 # PowerShell
-pwsh .\node_modules\.bin\deepkit-type-install.ps1
+pwsh ./node_modules/.bin/deepkit-type-install.ps1
 ```
 
 _tsconfig.json_
