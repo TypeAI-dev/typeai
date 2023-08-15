@@ -4,18 +4,11 @@ import {
   ChatCompletionRequestMessageRoleEnum,
 } from 'openai'
 import { Configuration, OpenAIApi } from 'openai'
-import {
-  ReceiveType,
-  ReflectionFunction,
-  stringifyType,
-  TypeObjectLiteral,
-  Type,
-} from '@deepkit/type'
-import { serialize, getSchema } from './utils'
-import { SchemaRegistry, SchemeEntry } from '../src/SchemaRegistry'
+import { ReceiveType, ReflectionFunction, TypeObjectLiteral, Type } from '@deepkit/type'
+import { schemaToJSONSchema } from './utils'
+import { SchemaRegistry } from '../src/SchemaRegistry'
 import { TypeSchemaResolver } from '../src/TypeSchemaResolver'
 import { JSONSchema, JSONSchemaOpenAIFunction } from './types'
-import { ToolFunction } from './ToolFunction'
 import Debug from 'debug'
 import * as util from 'util'
 const debug = Debug('typeai')
@@ -100,62 +93,31 @@ export type AIFunctionOptions = {
   model?: string
   description?: string
 }
+
+/**
+ * Returns a synthesized function that uses the OpenAI API to implement the desired behavior, with type signature matching `f`.
+ *
+ * @typeParam T - the input type of the generated AI function
+ * @typeParam R - the output type of the generated AI function
+ * @param f - a stub function with the desired type signature for the generated AI function
+ * @param toAIFunctionOptions - options for the generated AI function
+ *
+ * @returns A function with AI-backed implementation, respecting the type signature of `f`
+ *          and the behavior described in the JSDoc description tag for `f`.
+ */
 export function toAIFunction<T, R>(
   f: (input: T) => R,
   toAIFunctionOptions?: ToAIFunctionOptions,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
 ): <MagicAIFunction>(input: T, aiFunctionOptions?: AIFunctionOptions) => Promise<Exclude<R, void>> {
-  type RMinusVoid = Exclude<R, void>
-  const wrappedFn = ReflectionFunction.from(f)
-  debug(`toAIFunction: wrappedFn: ${util.inspect(wrappedFn, { depth: 8 })}`)
-  debug(`stringifyType: wrappedFn: ${stringifyType(wrappedFn.type)}`)
-
-  const fnSignature = `${wrappedFn.name.replace('Spec', '')}${stringifyType(wrappedFn.type).replace(
-    '| void',
-    '',
-  )}`
-
-  // Function provided to LLM to submit answer
-  const submitLLMGeneratedData = function submitLLMGeneratedData(result: R): string {
-    debugNet(`LLM result: ${JSON.stringify(result, null, 2)}`)
-    return '{ "status": "ok" }'
+  const rfn = ReflectionFunction.from(f)
+  const tType = rfn.type.parameters[0].type
+  const rType = rfn.type.return
+  const options: ToAIFunctionViaRuntimeTypesOptions = {
+    model: toAIFunctionOptions?.model,
+    name: f.name,
   }
-
-  // Build JSON schema description of wrapped function
-  const wrappedFnTool = ToolFunction.from(f)
-  const wrappedFnJSONSchema = wrappedFnTool.schema
-  const inputJSONSchema = wrappedFnJSONSchema.parameters?.properties
-
-  // Build JSON schema description of submitLLMGeneratedData
-  const submitLLMGeneratedDataTool = ToolFunction.from(submitLLMGeneratedData)
-  const submitGeneratedDataSchema = submitLLMGeneratedDataTool.schema
-
-  // Magic function
-  type MagicAIFunction = {
-    (input: T, aiFunctionOptions?: AIFunctionOptions): Promise<RMinusVoid>
-    description: string
-  }
-  const fn = <MagicAIFunction>(async (
-    input: T,
-    aiFunctionOptions?: AIFunctionOptions,
-  ): Promise<RMinusVoid> => {
-    const options: AIFunctionOptions = {
-      model: aiFunctionOptions?.model || toAIFunctionOptions?.model,
-      description: aiFunctionOptions?.description || wrappedFn.description,
-    }
-    const purpose = aiFunctionOptions?.description || wrappedFn.description
-    const res = await _infer(
-      purpose,
-      fnSignature,
-      submitGeneratedDataSchema,
-      inputJSONSchema,
-      input,
-      options,
-    )
-    return Promise.resolve(res as RMinusVoid)
-  })
-  fn.prototype = { description: wrappedFn.description }
-
+  const fn = toAIFunctionViaRuntimeTypes<T, R>(tType, rType, options)
   return fn
 }
 
@@ -173,7 +135,6 @@ export function toAIFunctionViaRuntimeTypes<T, R>(
 
   const toAIFunctionOptions = options
   const name = options?.name || `to${rType.typeName}`
-  const signature = `${name}(input: string) => ${rType.typeName}`
   const inputJSONSchema = {
     input: {
       type: 'string',
@@ -185,18 +146,18 @@ export function toAIFunctionViaRuntimeTypes<T, R>(
   const registry = options?.registry || SchemaRegistry.getInstance()
   const resolver = new TypeSchemaResolver(rType, registry)
   resolver.resolve()
-  const rKey = registry.getTypeKey(rType)
-  const rSchemeEntry = registry.store.get(rKey) as SchemeEntry
-  const schema = getSchema(registry, rSchemeEntry)
-  const rSchema = serialize(schema)
   debug(`registry.store: ${util.inspect(registry.store, { depth: 8 })}`)
+  const rSchemaJSON = schemaToJSONSchema(resolver.result)
+
+  const rKey = registry.getTypeKey(rType)
+  const signature = `${name}(input: string) => ${rType.typeName || rKey}`
 
   const submitGeneratedDataSchema: JSONSchemaOpenAIFunction = {
     name: 'submitLLMGeneratedData',
     parameters: {
       type: 'object',
       properties: {
-        result: rSchema,
+        result: rSchemaJSON,
       },
       required: ['result'],
     },

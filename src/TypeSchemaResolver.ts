@@ -141,7 +141,6 @@ export class TypeSchemaResolver {
       this.result.required = required
     }
 
-    // const registryKey = this.schemaRegisty.getSchemaKey(this.t)
     let registryKey: string = String(typeFunction.name)
     if (this.options?.overrideName) {
       registryKey = this.options.overrideName

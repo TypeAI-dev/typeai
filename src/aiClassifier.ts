@@ -57,6 +57,25 @@ const _infer = async (purpose: string, tStrings: string[], text: string): Promis
   return tStrings[index]
 }
 
+/**
+ * Returns a synthesized function that classifies `text` according to the provided `enumType`.
+ *
+ * @example
+ * ```
+ * \/** @description Classification labels for the basic type of matter, living or not *\/
+ * enum BasicMatterTypeEnum {
+ *   ANIMAL = 'animal',
+ *   VEGETABLE = 'vegetable',
+ *   MINERAL = 'mineral',
+ * }
+ * const BasicMatterType = toAIClassifier<BasicMatterTypeEnum>()
+ * ```
+ *
+ * @typeParam T - the type of the enum providing the classification classes
+ * @param purposeOverride - an optional override for description of the classifier
+ *
+ * @returns A function with AI-backed implementation, which classifies `text` according to the provided `enumType`.
+ */
 export function toAIClassifier<T>(
   purposeOverride?: string,
   p?: ReceiveType<T>,

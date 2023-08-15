@@ -10,7 +10,7 @@ export const truncateByTokens = (text: string, maxTokens: number): string => {
   return decode(encode(text).slice(0, maxTokens))
 }
 
-function schemaToJSONSchema(schema: Schema): JSONSchema {
+export function schemaToJSONSchema(schema: Schema): JSONSchema {
   const jsonSchema: JSONSchema = {
     type: (schema.type as JSONSchemaTypeString) || 'null',
   }

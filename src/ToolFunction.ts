@@ -108,9 +108,10 @@ export class ToolFunction {
 
   static from<R>(fn: (...args: any[]) => R, options?: ToolFunctionFromOptions): ToolFunction {
     const reflectFn = ReflectionFunction.from(fn)
+    const name = options?.overrideName || fn.name
     const registry = options?.registry || SchemaRegistry.getInstance()
     const resolver = new TypeSchemaResolver(reflectFn.type, registry, {
-      overrideName: options?.overrideName,
+      overrideName: name,
     })
     resolver.resolve()
     const oaif = new ToolFunction(fn, registry)

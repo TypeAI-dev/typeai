@@ -41,10 +41,11 @@ Just specify your types and function signatures as you naturally would, and Type
      - AI Classifiers
    - **Using TypeAI to expose functionality to an LLM**
      - AI "Tool Functions"
-3. [How does it work?](#how)
-4. [Future Direction & TODOs](#future)
-5. [Acknowledgements](#acknowledgements)
-6. [License](#license)
+3. [Gotchas](#gotchas)
+4. [How does it work?](#how)
+5. [Future Direction & TODOs](#future)
+6. [Acknowledgements](#acknowledgements)
+7. [License](#license)
 
 ### Support
 
@@ -85,6 +86,15 @@ _tsconfig.json_
   },
   "reflection": true
 }
+```
+
+NOTE: Some runtimes, such as `tsx`, won't work with Deepkit. See [Gotchas](#gotchas) for more info.
+
+_At execution time_
+
+```sh
+export OPENAI_API_KEY='...'    # currently required for core functionality
+export BING_API_KEY='...'      # if using predefined SearchWeb Tool function
 ```
 
 TypeAI makes connecting your functions and types to AI APIs like OpenAI's chat completion endpoints lightweight by using runtime type reflection on TypeScript code to generate the JSON schema required by OpenAI's function calling feature, and by handling function dispatch and result delivery to the LLM.
@@ -256,6 +266,12 @@ Good afternoon, Boston! This is your weather reporter bringing you the latest
 updates. Currently, we're experiencing a pleasant temperature of 82 degrees Celsius. The sky is a mix of sunshine and clouds, making for a beautiful day. However, there is a 25% chance of precipitation, so you might want to keep an umbrella handy. Additionally, the atmospheric pressure is at 25 mmHg. Overall, it's a great day to get outside and enjoy the city. Stay safe and have a wonderful time!
 */
 ```
+
+## <a name="gotchas"></a>Gotchas
+
+Due to the way Deepkit injects it's type-compiler transform, by patching tsc, some runtimes may not work. These are know NOT to work:
+
+- `tsx`
 
 ## <a name="how"></a>How does it work?
 
