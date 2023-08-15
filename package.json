@@ -1,6 +1,6 @@
 {
   "name": "@typeai/core",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "An AI Engineering Framework for TypeScript",
   "author": "Jeff LaPorte (https://github.com/jefflaporte)",
   "repository": "https://github.com/TypeAI-dev/typeai",
