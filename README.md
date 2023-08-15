@@ -64,7 +64,10 @@ npm install @typeai/core @deepkit/core
 ```sh
 npm install @deepkit/type@npm:@jefflaporte/deepkit-type@1.0.1-alpha.97-jl
 npm install --save-dev @deepkit/type-compiler@npm:@jefflaporte/deepkit-type-compiler@1.0.1-alpha.97-jl
+# Bash
 ./node_modules/.bin/deepkit-type-install
+# PowerShell
+pwsh ./node_modules/.bin/deepkit-type-install.ps1
 ```
 
 _tsconfig.json_
